@@ -36,16 +36,21 @@ public class ApplicationManager {
      * Some kind of page factory
      */
     public static WebDriver build(String browser) {
+        if (System.getenv("APPDATA") != null && System.getProperty("user.home") == null) {
+            System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "/src/main/resources/drivers/chromedriver.exe");
+            System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "/src/main/resources/drivers/geckodriver.exe");
+        } else {
+            System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "/src/main/resources/drivers/chromedriver");
+            System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "/src/main/resources/drivers/geckodriver");
+        }
         switch (browser) {
             case "chrome":
-                System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "/src/main/resources/drivers/chromedriver");
                 ChromeOptions chromeOptions = new ChromeOptions();
                 Map<String, Object> prefs = new HashMap<>();
                 prefs.put("profile.default_content_settings.popups", 0);
                 chromeOptions.setExperimentalOption("prefs", prefs);
                 return new ChromeDriver(chromeOptions);
             case "firefox":
-                System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "/src/main/resources/drivers/geckodriver");
                 FirefoxProfile profile = new FirefoxProfile();
                 profile.setPreference("dom.webnotifications.enabled", false);
                 DesiredCapabilities capabilities = DesiredCapabilities.firefox();
