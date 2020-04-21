@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+}
+
+apply plugin: 'java'
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+def buildDir = './build'
+def outputDir = './app'
+def jarName = rootProject.name
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile (group: 'junit', name: 'junit', version: '4.12'){
+        exclude group: 'org.hamcrest'
+    }
+    compile 'org.seleniumhq.selenium:selenium-java:3.141.59'
+    compile 'org.seleniumhq.selenium:selenium-server:3.141.59'
+    testCompile 'org.hamcrest:hamcrest:2.2'
+}
+
+jar {
+    baseName(jarName)
+    from {
+        manifest {
+            attributes 'Implementation-Title': 'LinkedinBot',
+                    'Implementation-Version': 'version',
+                    'Main-Class': 'com.linkedin.info.mainpack.StartApp',
+                    'Class-Path': 'lib/' + jarName + '-' + version + '.jar'
+        }
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+task makeApp(dependsOn: 'compileJava') {
+    doLast {
+        println('App built!')
+        copy {
+            from "$buildDir/libs/" + jarName + '-' + version + '.jar'
+            into "$outputDir"
+        }
+
+        copy {
+            from "$buildDir/resources"
+            into "$outputDir/resources"
+        }
+    }
+}
